@@ -1,6 +1,6 @@
 # pytorch-ssim
 
-### Optimizable structure similarity (SSIM) index.
+### Differentiable structure similarity (SSIM) index.
 ![einstein](https://raw.githubusercontent.com/Po-Hsun-Su/pytorch-ssim/master/einstein.png) ![Max_ssim](https://raw.githubusercontent.com/Po-Hsun-Su/pytorch-ssim/master/max_ssim.gif)
 
 ## Example
@@ -20,7 +20,7 @@ ssim_loss = pytorch_ssim.SSIM(window_size = 11)
 print(ssim_loss(img1, img2))
 
 ```
-### maximizing ssim
+### maximize ssim
 ```python
 import pytorch_ssim
 import torch
