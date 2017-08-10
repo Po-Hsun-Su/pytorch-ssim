@@ -1,6 +1,9 @@
 # pytorch-ssim
 
-####Differentiable structure similarity (SSIM) index.
+#### Differentiable structure similarity (SSIM) index.
+![einstein](https://raw.githubusercontent.com/Po-Hsun-Su/pytorch-ssim/master/einstein.png)
+
+![Max_ssim](https://raw.githubusercontent.com/Po-Hsun-Su/pytorch-ssim/master/max_ssim.gif)
 
 ## Example
 
