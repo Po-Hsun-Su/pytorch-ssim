@@ -3,3 +3,5 @@
 *.png
 *.jpg
 test*
+!einstein.png
+!max_ssim.gif
