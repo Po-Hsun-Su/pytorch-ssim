@@ -3,6 +3,11 @@
 ### Differentiable structural similarity (SSIM) index.
 ![einstein](https://raw.githubusercontent.com/Po-Hsun-Su/pytorch-ssim/master/einstein.png) ![Max_ssim](https://raw.githubusercontent.com/Po-Hsun-Su/pytorch-ssim/master/max_ssim.gif)
 
+## Installation
+```bash
+pip install pytorch_ssim
+```
+
 ## Example
 ### basic usage
 ```python

@@ -5,3 +5,5 @@
 test*
 !einstein.png
 !max_ssim.gif
+MANIFEST
+dist/*
