@@ -7,3 +7,4 @@ test*
 !max_ssim.gif
 MANIFEST
 dist/*
+.sync-config.cson

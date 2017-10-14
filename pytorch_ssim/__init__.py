@@ -11,7 +11,7 @@ def gaussian(window_size, sigma):
 def create_window(window_size, channel):
     _1D_window = gaussian(window_size, 1.5).unsqueeze(1)
     _2D_window = _1D_window.mm(_1D_window.t()).float().unsqueeze(0).unsqueeze(0)
-    window = Variable(_2D_window.expand(channel, 1, window_size, window_size))
+    window = Variable(_2D_window.expand(channel, 1, window_size, window_size).contiguous())
     return window
 
 def _ssim(img1, img2, window, window_size, channel, size_average = True):
@@ -47,16 +47,17 @@ class SSIM(torch.nn.Module):
     def forward(self, img1, img2):
         (_, channel, _, _) = img1.size()
 
-        if channel == self.channel:
+        if channel == self.channel and window.type() == img1.type():
             window = self.window
         else:
-            window = create_window(self.window_size, channel)
+            window = create_window(self.window_size, channel).type_as(img1)
             self.window = window
             self.channel = channel
+
 
         return _ssim(img1, img2, window, self.window_size, channel, self.size_average)
 
 def ssim(img1, img2, window_size = 11, size_average = True):
     (_, channel, _, _) = img1.size()
-    window = create_window(window_size, channel)
+    window = create_window(window_size, channel).type_as(img1)
     return _ssim(img1, img2, window, window_size, channel, size_average)
