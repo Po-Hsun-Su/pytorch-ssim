@@ -4,9 +4,8 @@
 ![einstein](https://raw.githubusercontent.com/Po-Hsun-Su/pytorch-ssim/master/einstein.png) ![Max_ssim](https://raw.githubusercontent.com/Po-Hsun-Su/pytorch-ssim/master/max_ssim.gif)
 
 ## Installation
-```bash
-pip install pytorch_ssim
-```
+1. Clone this repo.
+2. Copy "pytorch_ssim" folder in your project.
 
 ## Example
 ### basic usage
