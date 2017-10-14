@@ -1,35 +1,3 @@
-# pytorch-ssim
-
-### Differentiable structural similarity (SSIM) index.
-![einstein](https://raw.githubusercontent.com/Po-Hsun-Su/pytorch-ssim/master/einstein.png) ![Max_ssim](https://raw.githubusercontent.com/Po-Hsun-Su/pytorch-ssim/master/max_ssim.gif)
-
-## Installation
-1. Clone this repo.
-2. Copy "pytorch_ssim" folder in your project.
-
-## Example
-### basic usage
-```python
-import pytorch_ssim
-import torch
-from torch.autograd import Variable
-
-img1 = Variable(torch.rand(1, 1, 256, 256))
-img2 = Variable(torch.rand(1, 1, 256, 256))
-
-if torch.cuda.is_available():
-    img1 = img1.cuda()
-    img2 = img2.cuda()
-
-print(pytorch_ssim.ssim(img1, img2))
-
-ssim_loss = pytorch_ssim.SSIM(window_size = 11)
-
-print(ssim_loss(img1, img2))
-
-```
-### maximize ssim
-```python
 import pytorch_ssim
 import torch
 from torch.autograd import Variable
@@ -67,8 +35,3 @@ while ssim_value < 0.95:
     print(ssim_value)
     ssim_out.backward()
     optimizer.step()
-
-```
-
-## Reference
-https://ece.uwaterloo.ca/~z70wang/research/ssim/
