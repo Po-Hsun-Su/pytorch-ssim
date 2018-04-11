@@ -89,7 +89,8 @@ def ssim(img1, img2, window_size=11, size_average=True, full=False):
     return _ssim(img1, img2, window, real_size, channel, size_average, full=full)
 
 
-def msssim(img1, img2, window_size=11):
+def msssim(img1, img2, window_size=11, size_average=True):
+    # TODO: fix NAN results
     if img1.size() != img2.size():
         raise RuntimeError('Input images must have the same shape (%s vs. %s).',
                            img1.size(), img2.size())
@@ -97,14 +98,19 @@ def msssim(img1, img2, window_size=11):
         raise RuntimeError('Input images must have four dimensions, not %d',
                            len(img1.size()))
 
-    weights = Variable(torch.FloatTensor([0.0448, 0.2856, 0.3001, 0.2363, 0.1333])).cuda()
-    levels = weights.size()[0]
+    if type(img1) is not Variable or type(img2) is not Variable:
+        raise RuntimeError('Input images must be Variables, not %s' % 
+                            img1.__class__.__name__)
 
+    weights = Variable(torch.FloatTensor([0.0448, 0.2856, 0.3001, 0.2363, 0.1333]))
+    if img1.is_cuda:
+        weights = weights.cuda(img1.get_device())
+
+    levels = weights.size()[0]
     mssim = []
     mcs = []
-
     for _ in range(levels):
-        sim, cs = ssim(img1, img2, window_size=window_size, full=True)
+        sim, cs = ssim(img1, img2, window_size=window_size, size_average=size_average, full=True)
         mssim.append(sim)
         mcs.append(cs)
 
@@ -115,3 +121,15 @@ def msssim(img1, img2, window_size=11):
     mcs = torch.cat(mcs)
     return (torch.prod(mcs[0:levels-1] ** weights[0:levels-1]) *
             (mssim[levels-1] ** weights[levels-1]))
+
+
+class MSSSIM(torch.nn.Module):
+    def __init__(self, window_size=11, size_average=True, channel=3):
+        super(MSSSIM, self).__init__()
+        self.window_size = window_size
+        self.size_average = size_average
+        self.channel = channel
+
+    def forward(self, img1, img2):
+        # TODO: store window between calls if possible
+        return msssim(img1, img2, window_size=self.window_size, size_average=self.size_average)
