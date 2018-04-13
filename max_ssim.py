@@ -1,4 +1,4 @@
-import pytorch_ssim
+import pytorch_msssim
 import torch
 from torch.autograd import Variable
 from torch import optim
@@ -19,19 +19,19 @@ img1 = Variable( img1,  requires_grad=False)
 img2 = Variable( img2, requires_grad = True)
 
 
-# Functional: pytorch_ssim.ssim(img1, img2, window_size = 11, size_average = True)
-ssim_value = pytorch_ssim.ssim(img1, img2).data[0]
-print("Initial ssim:", ssim_value)
+# Functional: pytorch_msssim.msssim(img1, img2, window_size = 11, size_average = True)
+msssim_value = pytorch_msssim.msssim(img1, img2).data[0]
+print("Initial msssim:", msssim_value)
 
-# Module: pytorch_ssim.SSIM(window_size = 11, size_average = True)
-ssim_loss = pytorch_ssim.SSIM()
+# Module: pytorch_msssim.SSIM(window_size = 11, size_average = True)
+msssim_loss = pytorch_msssim.SSIM()
 
 optimizer = optim.Adam([img2], lr=0.01)
 
-while ssim_value < 0.95:
+while msssim_value < 0.95:
     optimizer.zero_grad()
-    ssim_out = -ssim_loss(img1, img2)
-    ssim_value = - ssim_out.data[0]
-    print(ssim_value)
-    ssim_out.backward()
+    msssim_out = -msssim_loss(img1, img2)
+    msssim_value = - msssim_out.data[0]
+    print(msssim_value)
+    msssim_out.backward()
     optimizer.step()
