@@ -92,10 +92,10 @@ def ssim(img1, img2, window_size=11, size_average=True, full=False):
 def msssim(img1, img2, window_size=11, size_average=True):
     # TODO: fix NAN results
     if img1.size() != img2.size():
-        raise RuntimeError('Input images must have the same shape (%s vs. %s).',
-                           img1.size(), img2.size())
+        raise RuntimeError('Input images must have the same shape (%s vs. %s).' %
+                           (img1.size(), img2.size()))
     if len(img1.size()) != 4:
-        raise RuntimeError('Input images must have four dimensions, not %d',
+        raise RuntimeError('Input images must have four dimensions, not %d' %
                            len(img1.size()))
 
     if type(img1) is not Variable or type(img2) is not Variable:
