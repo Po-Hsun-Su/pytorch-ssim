@@ -1,19 +1,19 @@
 import torch
 import torch.nn.functional as F
+from torch.autograd import Variable
 import numpy as np
 from math import exp
 
 
 def gaussian(window_size, sigma):
     gauss = torch.Tensor([exp(-(x - window_size//2)**2/float(2*sigma**2)) for x in range(window_size)])
-    gauss.requires_grad = True
     return gauss/gauss.sum()
 
 
 def create_window(window_size, channel):
     _1D_window = gaussian(window_size, 1.5).unsqueeze(1)
     _2D_window = _1D_window.mm(_1D_window.t()).float().unsqueeze(0).unsqueeze(0)
-    window = _2D_window.expand(channel, 1, window_size, window_size).contiguous()
+    window = Variable(_2D_window.expand(channel, 1, window_size, window_size).contiguous())
     return window
 
 
@@ -97,12 +97,14 @@ def msssim(img1, img2, window_size=11, size_average=True):
     if len(img1.size()) != 4:
         raise RuntimeError('Input images must have four dimensions, not %d' %
                            len(img1.size()))
-    if img1.device != img2.device:
-        raise RuntimeError('Input images must be on the same device')
 
-    device = img1.device
-    weights = torch.FloatTensor([0.0448, 0.2856, 0.3001, 0.2363, 0.1333]).to(device)
-    weights.requires_grad = True
+    if type(img1) is not Variable or type(img2) is not Variable:
+        raise RuntimeError('Input images must be Variables, not %s' % 
+                            img1.__class__.__name__)
+
+    weights = Variable(torch.FloatTensor([0.0448, 0.2856, 0.3001, 0.2363, 0.1333]))
+    if img1.is_cuda:
+        weights = weights.cuda(img1.get_device())
 
     levels = weights.size()[0]
     mssim = []
@@ -115,8 +117,8 @@ def msssim(img1, img2, window_size=11, size_average=True):
         img1 = F.avg_pool2d(img1, (2, 2))
         img2 = F.avg_pool2d(img2, (2, 2))
 
-    mssim = torch.Tensor(mssim).to(device)
-    mcs = torch.Tensor(mcs).to(device)
+    mssim = torch.cat(mssim)
+    mcs = torch.cat(mcs)
     return (torch.prod(mcs[0:levels-1] ** weights[0:levels-1]) *
             (mssim[levels-1] ** weights[levels-1]))
 
