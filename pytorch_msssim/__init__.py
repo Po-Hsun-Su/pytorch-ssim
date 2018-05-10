@@ -6,7 +6,7 @@ from math import exp
 
 def gaussian(window_size, sigma):
     gauss = torch.Tensor([exp(-(x - window_size//2)**2/float(2*sigma**2)) for x in range(window_size)])
-    gauss.requires_grad = True
+    #gauss.requires_grad = True
     return gauss/gauss.sum()
 
 
@@ -90,20 +90,8 @@ def ssim(img1, img2, window_size=11, size_average=True, full=False):
 
 
 def msssim(img1, img2, window_size=11, size_average=True):
-    # TODO: fix NAN results
-    if img1.size() != img2.size():
-        raise RuntimeError('Input images must have the same shape (%s vs. %s).' %
-                           (img1.size(), img2.size()))
-    if len(img1.size()) != 4:
-        raise RuntimeError('Input images must have four dimensions, not %d' %
-                           len(img1.size()))
-    if img1.device != img2.device:
-        raise RuntimeError('Input images must be on the same device')
-
     device = img1.device
     weights = torch.FloatTensor([0.0448, 0.2856, 0.3001, 0.2363, 0.1333]).to(device)
-    weights.requires_grad = True
-
     levels = weights.size()[0]
     mssim = []
     mcs = []
@@ -115,10 +103,9 @@ def msssim(img1, img2, window_size=11, size_average=True):
         img1 = F.avg_pool2d(img1, (2, 2))
         img2 = F.avg_pool2d(img2, (2, 2))
 
-    mssim = torch.Tensor(mssim).to(device)
-    mcs = torch.Tensor(mcs).to(device)
-    return (torch.prod(mcs[0:levels-1] ** weights[0:levels-1]) *
-            (mssim[levels-1] ** weights[levels-1]))
+    mssim = torch.stack(mssim)
+    mcs = torch.stack(mcs)
+    return torch.prod((mcs ** weights) * (mssim ** weights))
 
 
 class MSSSIM(torch.nn.Module):
