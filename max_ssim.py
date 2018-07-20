@@ -4,8 +4,10 @@ from torch import optim
 from scipy.misc import imread
 import numpy as np
 
+# display = True requires matplotlib
 display = True
-metric = 'MSSSIM'     # MSSSIM or SSIM
+metric = 'MSSSIM' # MSSSIM or SSIM
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def post_process(img):
     img = img.detach().cpu().numpy()
@@ -14,21 +16,21 @@ def post_process(img):
     return img
 
 # Preprocessing
-npImg1 = imread('einstein.png')
-if len(npImg1.shape) == 2:  # if no channel dimension exists
-    npImg1 = np.expand_dims(npImg1, axis=-1)
-npImg1 = np.transpose(npImg1, (2, 0, 1))    # adjust dimensions for pytorch
-npImg1 = np.expand_dims(npImg1, axis=0)    # add batch dimension
-npImg1 = npImg1 / 255.0     # normalize values between 0-1
-npImg1 = npImg1.astype(np.float32)  # adjust type
+np_img1 = imread('einstein.png')
 
-img1 = torch.from_numpy(npImg1)
+if len(np_img1.shape) == 2:                  # if no channel dimension exists
+    np_img1 = np.expand_dims(np_img1, axis=-1)
+np_img1 = np.transpose(np_img1, (2, 0, 1))   # adjust dimensions for pytorch
+np_img1 = np.expand_dims(np_img1, axis=0)    # add batch dimension
+np_img1 = np_img1 / 255.0                    # normalize values between 0-1
+np_img1 = np_img1.astype(np.float32)         # adjust type
+
+img1 = torch.from_numpy(np_img1)
 img2 = torch.rand(img1.size())
-img2 = torch.nn.functional.sigmoid(img2)    # use sigmoid to map values between 0-1
+img2 = torch.nn.functional.sigmoid(img2)     # use sigmoid to map values between 0-1
 
-if torch.cuda.is_available():
-    img1 = img1.cuda()
-    img2 = img2.cuda()
+img1 = img1.to(device)
+img2 = img2.to(device)
 
 img1.requires_grad = False
 img2.requires_grad = True
@@ -36,7 +38,7 @@ img2.requires_grad = True
 loss_func = msssim if metric == 'MSSSIM' else ssim
 
 value = loss_func(img1, img2)
-print("Initial {:s}: {:f}".format(metric, value.item()))
+print("Initial %s: %.5f" % (metric, value.item()))
 
 optimizer = optim.Adam([img2], lr=0.01)
 
@@ -47,7 +49,7 @@ while value < threshold:
     optimizer.zero_grad()
     msssim_out = -loss_func(img1, img2)
     value = -msssim_out.item()
-    print(value)
+    print('Current MS-SSIM = %.5f' % value)
     msssim_out.backward()
     optimizer.step()
 
@@ -65,5 +67,3 @@ if display:
     plt.imshow(img2np, cmap=cmap)
     plt.title('Generated, {:s}: {:.3f}'.format(metric, value))
     plt.show()
-
-
