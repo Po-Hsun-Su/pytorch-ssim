@@ -5,7 +5,6 @@ import numpy as np
 
 def gaussian(window_size, sigma):
     gauss = torch.Tensor([exp(-(x - window_size//2)**2/float(2*sigma**2)) for x in range(window_size)])
-    # gauss.requires_grad = True
     return gauss/gauss.sum()
 
 
@@ -56,11 +55,11 @@ def ssim(img1, img2, window_size=11, size_average=True, full=False, val_range=No
         C1 = (0.01 * L) ** 2
         C2 = (0.03 * L) ** 2
 
-        ssim_map = ((2 * mu1_mu2 + C1) * (2 * sigma12 + C2)) / ((mu1_sq + mu2_sq + C1) * (sigma1_sq + sigma2_sq + C2))
-
         v1 = 2.0 * sigma12 + C2
         v2 = sigma1_sq + sigma2_sq + C2
         cs = torch.mean(v1 / v2)  # contrast sensitivity
+
+        ssim_map = ((2 * mu1_mu2 + C1) * v1) / ((mu1_sq + mu2_sq + C1) * v2)
 
         if size_average:
             ret = ssim_map.mean()
@@ -78,7 +77,7 @@ def ssim(img1, img2, window_size=11, size_average=True, full=False, val_range=No
     return ret_mean
 
 
-def msssim(img1, img2, window_size=11, size_average=True, val_range=None):
+def msssim(img1, img2, window_size=11, size_average=True, val_range=None, normalize=False):
     device = img1.device
     weights = torch.FloatTensor([0.0448, 0.2856, 0.3001, 0.2363, 0.1333]).to(device)
     levels = weights.size()[0]
@@ -95,14 +94,13 @@ def msssim(img1, img2, window_size=11, size_average=True, val_range=None):
     mssim = torch.stack(mssim)
     mcs = torch.stack(mcs)
 
-    # # Normalize (to avoid NaNs)
-    #
-    # mssim = (mssim + 1) / 2
-    # mcs = (mcs + 1) / 2
+    # Normalize (to avoid NaNs during training unstable models, not compliant with original definition)
+    if normalize:
+        mssim = (mssim + 1) / 2
+        mcs = (mcs + 1) / 2
 
     pow1 = mcs ** weights
     pow2 = mssim ** weights
-    # output = torch.prod(pow1 * pow2)
     # From Matlab implementation https://ece.uwaterloo.ca/~z70wang/research/iwssim/
     output = torch.prod(pow1[:-1] * pow2[-1])
     return output
