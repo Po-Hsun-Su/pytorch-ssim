@@ -7,6 +7,9 @@ At the moment only a direct method is supported.
 
 ## Installation
 
+
+Master branch supports PyTorch 0.3.1 or lower. For PyTorch 0.4 support use the dev branch.
+
 1. Go to the repo directory.
 2. Run `python setup.py install`
 
