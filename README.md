@@ -31,7 +31,7 @@ git checkout tags/checkpoint-0.3
 
 ### Basic usage
 ```python
-import pytorch_ssim
+import pytorch_msssim
 import torch
 from torch.autograd import Variable
 
