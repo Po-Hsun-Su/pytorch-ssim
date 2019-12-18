@@ -51,11 +51,11 @@ img1 = Variable( img1,  requires_grad=False)
 img2 = Variable( img2, requires_grad = True)
 
 
-# Functional: pytorch_ssim.ssim(img1, img2, window_size = 11, size_average = True)
+# Functional: pytorch_ssim.ssim(img1, img2, window_size = 11, size_average = True,reduction='mean')
 ssim_value = pytorch_ssim.ssim(img1, img2).data[0]
 print("Initial ssim:", ssim_value)
 
-# Module: pytorch_ssim.SSIM(window_size = 11, size_average = True)
+# Module: pytorch_ssim.SSIM(window_size = 11, size_average = True,reduction='mean')
 ssim_loss = pytorch_ssim.SSIM()
 
 optimizer = optim.Adam([img2], lr=0.01)
