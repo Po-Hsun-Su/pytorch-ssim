@@ -1,4 +1,5 @@
 # pytorch-ssim
+**This repo is not maintained. Please find other working forks. **
 
 ### Differentiable structural similarity (SSIM) index.
 ![einstein](https://raw.githubusercontent.com/Po-Hsun-Su/pytorch-ssim/master/einstein.png) ![Max_ssim](https://raw.githubusercontent.com/Po-Hsun-Su/pytorch-ssim/master/max_ssim.gif)
